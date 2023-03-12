@@ -4,8 +4,8 @@ class Game {
   }
 
   isMovesLeft() {
-    for (let i = 0; i < SIZE; i++)
-      for (let j = 0; j < SIZE; j++)
+    for (let i = 0; i < MATRIX_SIZE; i++)
+      for (let j = 0; j < MATRIX_SIZE; j++)
         if (this.matrix[i][j] == EMPTY) return true;
 
     return false;
@@ -13,7 +13,7 @@ class Game {
 
   evaluate() {
     // Checking for Rows for X or O victory.
-    for (let row = 0; row < SIZE; row++) {
+    for (let row = 0; row < MATRIX_SIZE; row++) {
       const row_checkmate_value = this.getCheckmateValue(this.matrix[row]);
       if (row_checkmate_value) {
         return row_checkmate_value;
@@ -21,9 +21,9 @@ class Game {
     }
 
     // Checking for Columns for X or O victory.
-    for (let row = 0; row < SIZE; row++) {
+    for (let row = 0; row < MATRIX_SIZE; row++) {
       const col_data = [];
-      for (let col = 0; col < SIZE; col++) {
+      for (let col = 0; col < MATRIX_SIZE; col++) {
         col_data.push(this.matrix[row][col]);
       }
 
@@ -37,9 +37,9 @@ class Game {
     const principal_data = [];
     const secondary_data = [];
 
-    for (let row = 0; row < SIZE; row++) {
+    for (let row = 0; row < MATRIX_SIZE; row++) {
       principal_data.push(this.matrix[row][row]);
-      secondary_data.push(this.matrix[row][SIZE - row - 1]);
+      secondary_data.push(this.matrix[row][MATRIX_SIZE - row - 1]);
     }
 
     const principal_checkmate_value = this.getCheckmateValue(principal_data);
@@ -106,8 +106,8 @@ class Game {
   }
 
   findBestValue(type, callback) {
-    for (let i = 0; i < SIZE; i++) {
-      for (let j = 0; j < SIZE; j++) {
+    for (let i = 0; i < MATRIX_SIZE; i++) {
+      for (let j = 0; j < MATRIX_SIZE; j++) {
         if (this.matrix[i][j] === EMPTY) {
           this.matrix[i][j] = type;
           callback();
@@ -121,8 +121,8 @@ class Game {
     let best_value = Number.NEGATIVE_INFINITY;
     const best_move = { row: -1, col: -1 };
 
-    for (let i = 0; i < SIZE; i++) {
-      for (let j = 0; j < SIZE; j++) {
+    for (let i = 0; i < MATRIX_SIZE; i++) {
+      for (let j = 0; j < MATRIX_SIZE; j++) {
         if (this.matrix[i][j] == EMPTY) {
           this.matrix[i][j] = PLAYER;
 
@@ -150,6 +150,7 @@ class Board {
     this.background_color = BOARD_BG_COLOR;
     this.canvas = undefined;
     this.ctx = undefined;
+    this.cell_size = 10;
 
     this.init();
   }
@@ -161,13 +162,34 @@ class Board {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.canvas.style.backgroundColor = this.background_color;
+
+    this.cell_size = this.width / MATRIX_SIZE;
   }
 
-  drawRows() {}
+  drawRows() {
+    for (let i = 1; i <= MATRIX_SIZE - 1; i++) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, i * this.cell_size);
+      this.ctx.lineTo(this.width, i * this.cell_size);
+      this.ctx.strokeStyle = "#ffffff";
+      this.ctx.stroke();
+    }
+  }
 
-  drawColumns() {}
+  drawColumns() {
+    for (let i = 1; i <= MATRIX_SIZE - 1; i++) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(i * this.cell_size, 0);
+      this.ctx.lineTo(i * this.cell_size, this.height);
+      this.ctx.strokeStyle = "#ffffff";
+      this.ctx.stroke();
+    }
+  }
 
-  draw() {}
+  draw() {
+    this.drawRows();
+    this.drawColumns();
+  }
 
   update() {
     window.requestAnimationFrame(draw);
@@ -175,6 +197,7 @@ class Board {
 }
 
 const board = new Board();
+board.draw();
 
 const matrix = [
   ["x", "o", "x"],
