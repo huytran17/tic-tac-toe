@@ -1,11 +1,12 @@
 class Game {
-  constructor(board) {
-    this.board = board;
+  constructor(matrix) {
+    this.matrix = matrix;
   }
 
   isMovesLeft() {
     for (let i = 0; i < SIZE; i++)
-      for (let j = 0; j < SIZE; j++) if (this.board[i][j] == EMPTY) return true;
+      for (let j = 0; j < SIZE; j++)
+        if (this.matrix[i][j] == EMPTY) return true;
 
     return false;
   }
@@ -13,7 +14,7 @@ class Game {
   evaluate() {
     // Checking for Rows for X or O victory.
     for (let row = 0; row < SIZE; row++) {
-      const row_checkmate_value = this.getCheckmateValue(this.board[row]);
+      const row_checkmate_value = this.getCheckmateValue(this.matrix[row]);
       if (row_checkmate_value) {
         return row_checkmate_value;
       }
@@ -23,7 +24,7 @@ class Game {
     for (let row = 0; row < SIZE; row++) {
       const col_data = [];
       for (let col = 0; col < SIZE; col++) {
-        col_data.push(this.board[row][col]);
+        col_data.push(this.matrix[row][col]);
       }
 
       const col_checkmate_value = this.getCheckmateValue(col_data);
@@ -37,8 +38,8 @@ class Game {
     const secondary_data = [];
 
     for (let row = 0; row < SIZE; row++) {
-      principal_data.push(this.board[row][row]);
-      secondary_data.push(this.board[row][SIZE - row - 1]);
+      principal_data.push(this.matrix[row][row]);
+      secondary_data.push(this.matrix[row][SIZE - row - 1]);
     }
 
     const principal_checkmate_value = this.getCheckmateValue(principal_data);
@@ -107,10 +108,10 @@ class Game {
   findBestValue(type, callback) {
     for (let i = 0; i < SIZE; i++) {
       for (let j = 0; j < SIZE; j++) {
-        if (this.board[i][j] === EMPTY) {
-          this.board[i][j] = type;
+        if (this.matrix[i][j] === EMPTY) {
+          this.matrix[i][j] = type;
           callback();
-          this.board[i][j] = EMPTY;
+          this.matrix[i][j] = EMPTY;
         }
       }
     }
@@ -122,12 +123,12 @@ class Game {
 
     for (let i = 0; i < SIZE; i++) {
       for (let j = 0; j < SIZE; j++) {
-        if (this.board[i][j] == EMPTY) {
-          this.board[i][j] = PLAYER;
+        if (this.matrix[i][j] == EMPTY) {
+          this.matrix[i][j] = PLAYER;
 
           let move_value = this.minimax(false);
 
-          this.board[i][j] = EMPTY;
+          this.matrix[i][j] = EMPTY;
 
           if (move_value > best_value) {
             best_move.row = i;
@@ -138,23 +139,48 @@ class Game {
       }
     }
 
-    document.write(
-      "The value of the best Move " + "is : ",
-      best_value + "<br><br>"
-    );
-
     return best_move;
   }
 }
 
-const board = [
+class Board {
+  constructor() {
+    this.width = BOARD_SIZE;
+    this.height = BOARD_SIZE;
+    this.background_color = BOARD_BG_COLOR;
+    this.canvas = undefined;
+    this.ctx = undefined;
+
+    this.init();
+  }
+
+  init() {
+    this.canvas = document.getElementById("canvas");
+    this.ctx = this.canvas.getContext("2d");
+
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    this.canvas.style.backgroundColor = this.background_color;
+  }
+
+  drawRows() {}
+
+  drawColumns() {}
+
+  draw() {}
+
+  update() {
+    window.requestAnimationFrame(draw);
+  }
+}
+
+const board = new Board();
+
+const matrix = [
   ["x", "o", "x"],
   ["o", "o", "_"],
   ["_", "_", "x"],
 ];
 
-const game = new Game(board);
+const game = new Game(matrix);
 const best_move = game.findBestMove();
-
-document.write("The Optimal Move is :<br>");
-document.write("ROW: " + best_move.row + " COL: " + best_move.col + "<br>");
