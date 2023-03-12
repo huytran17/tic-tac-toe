@@ -98,7 +98,7 @@ class Game {
     let best_value = Number.POSITIVE_INFINITY;
 
     this.findBestValue(
-      PLAYER,
+      BOT,
       () => (best_value = Math.min(best_value, this.minimax(!is_player_turn)))
     );
 
@@ -144,7 +144,8 @@ class Game {
 }
 
 class Board {
-  constructor() {
+  constructor(game) {
+    this.game = game;
     this.width = BOARD_SIZE;
     this.height = BOARD_SIZE;
     this.background_color = BOARD_BG_COLOR;
@@ -162,8 +163,23 @@ class Board {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.canvas.style.backgroundColor = this.background_color;
+    this.canvas.addEventListener("mousedown", (event) => {
+      this.playerClick(event);
+    });
 
     this.cell_size = this.width / MATRIX_SIZE;
+  }
+
+  playerClick(event) {
+    const rect = this.canvas.getBoundingClientRect();
+    const col_coord = event.clientX - rect.left;
+    const row_coord = event.clientY - rect.top;
+
+    const col = Math.floor(col_coord / this.cell_size);
+    const row = Math.floor(row_coord / this.cell_size);
+
+    const is_empty_cell = this.game.matrix[row][col] === EMPTY;
+    is_empty_cell && (this.game.matrix[row][col] = PLAYER);
   }
 
   drawRows() {
@@ -196,9 +212,6 @@ class Board {
   }
 }
 
-const board = new Board();
-board.draw();
-
 const matrix = [
   ["x", "o", "x"],
   ["o", "o", "_"],
@@ -206,4 +219,8 @@ const matrix = [
 ];
 
 const game = new Game(matrix);
+
+const board = new Board(game);
+board.draw();
+
 const best_move = game.findBestMove();
