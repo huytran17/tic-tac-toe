@@ -21,9 +21,9 @@ class Game {
     }
 
     // Checking for Columns for X or O victory.
-    for (let row = 0; row < MATRIX_SIZE; row++) {
+    for (let col = 0; col < MATRIX_SIZE; col++) {
       const col_data = [];
-      for (let col = 0; col < MATRIX_SIZE; col++) {
+      for (let row = 0; row < MATRIX_SIZE; row++) {
         col_data.push(this.matrix[row][col]);
       }
 
@@ -74,7 +74,7 @@ class Game {
 
     if (got_best_value) return score;
 
-    if (this.isMovesLeft() == false) return DRAW_VALUE;
+    if (!this.isMovesLeft()) return DRAW_VALUE;
 
     if (is_player_turn) {
       return this.findBestValueForPlayer(is_player_turn);
@@ -127,7 +127,6 @@ class Game {
           this.matrix[i][j] = PLAYER;
 
           let move_value = this.minimax(false);
-
           this.matrix[i][j] = EMPTY;
 
           if (move_value > best_value) {
@@ -168,6 +167,8 @@ class Board {
     });
 
     this.cell_size = this.width / MATRIX_SIZE;
+
+    this.draw();
   }
 
   playerClick(event) {
@@ -179,7 +180,29 @@ class Board {
     const row = Math.floor(row_coord / this.cell_size);
 
     const is_empty_cell = this.game.matrix[row][col] === EMPTY;
-    is_empty_cell && (this.game.matrix[row][col] = PLAYER);
+    if (!is_empty_cell) {
+      return;
+    }
+
+    this.game.matrix[row][col] = PLAYER;
+    this.draw();
+    const player_score = this.game.evaluate();
+    if (player_score === PLAYER_VALUE) {
+      return alert("player win");
+    }
+
+    setTimeout(() => {
+      const { row: best_row, col: best_col } = this.game.findBestMove();
+      const invalid_coords = best_row < 0 || best_row < 0;
+      if (invalid_coords) return;
+
+      this.game.matrix[best_row][best_col] = BOT;
+      this.draw();
+      const bot_score = this.game.evaluate();
+      if (bot_score === BOT_VALUE) {
+        return alert("bot win");
+      }
+    }, 1000);
   }
 
   drawRows() {
@@ -202,25 +225,36 @@ class Board {
     }
   }
 
-  draw() {
-    this.drawRows();
-    this.drawColumns();
+  drawText() {
+    for (let i = 0; i < MATRIX_SIZE; i++) {
+      for (let j = 0; j < MATRIX_SIZE; j++) {
+        if (this.game.matrix[i][j] === EMPTY) continue;
+
+        const x = j * this.cell_size + this.cell_size / 2;
+        const y = i * this.cell_size + this.cell_size / 2 + 12;
+
+        this.ctx.font = `${BOARD_TEXT_SIZE}px Arial`;
+        this.ctx.fillStyle = BOARD_TEXT_COLOR;
+        this.ctx.textAlign = "center";
+        this.ctx.fillText(this.game.matrix[i][j], x, y);
+      }
+    }
   }
 
-  update() {
-    window.requestAnimationFrame(draw);
+  draw() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.drawRows();
+    this.drawColumns();
+    this.drawText();
   }
 }
 
 const matrix = [
-  ["x", "o", "x"],
-  ["o", "o", "_"],
-  ["_", "_", "x"],
+  ["_", "_", "_"],
+  ["_", "_", "_"],
+  ["_", "_", "_"],
 ];
 
 const game = new Game(matrix);
 
 const board = new Board(game);
-board.draw();
-
-const best_move = game.findBestMove();
