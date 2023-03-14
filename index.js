@@ -1,6 +1,14 @@
+class Move {
+  constructor() {
+    this.row = -1;
+    this.col = -1;
+  }
+}
+
 class Game {
-  constructor(matrix) {
+  constructor(matrix, move) {
     this.matrix = matrix;
+    this.move = move;
   }
 
   isMovesLeft() {
@@ -118,27 +126,23 @@ class Game {
   }
 
   findBestMove() {
-    let best_value = Number.NEGATIVE_INFINITY;
-    const best_move = { row: -1, col: -1 };
+    let best_value = Number.POSITIVE_INFINITY;
 
     for (let i = 0; i < MATRIX_SIZE; i++) {
       for (let j = 0; j < MATRIX_SIZE; j++) {
-        if (this.matrix[i][j] == EMPTY) {
-          this.matrix[i][j] = PLAYER;
-
-          let move_value = this.minimax(false);
+        if (this.matrix[i][j] === EMPTY) {
+          this.matrix[i][j] = BOT;
+          const move_value = this.minimax(true);
           this.matrix[i][j] = EMPTY;
 
-          if (move_value > best_value) {
-            best_move.row = i;
-            best_move.col = j;
+          if (move_value < best_value) {
             best_value = move_value;
+            this.move.row = i;
+            this.move.col = j;
           }
         }
       }
     }
-
-    return best_move;
   }
 }
 
@@ -192,11 +196,11 @@ class Board {
     }
 
     setTimeout(() => {
-      const { row: best_row, col: best_col } = this.game.findBestMove();
-      const invalid_coords = best_row < 0 || best_row < 0;
+      this.game.findBestMove();
+      const invalid_coords = this.game.move.row < 0 || this.game.move.col < 0;
       if (invalid_coords) return;
 
-      this.game.matrix[best_row][best_col] = BOT;
+      this.game.matrix[this.game.move.row][this.game.move.col] = BOT;
       this.draw();
       const bot_score = this.game.evaluate();
       if (bot_score === BOT_VALUE) {
@@ -249,12 +253,16 @@ class Board {
   }
 }
 
+// const range = new Array(MATRIX_SIZE).fill();
+// const matrix = range.map(() => new Array(MATRIX_SIZE).fill("_"));
+
 const matrix = [
   ["_", "_", "_"],
   ["_", "_", "_"],
   ["_", "_", "_"],
 ];
 
-const game = new Game(matrix);
+const move = new Move();
+const game = new Game(matrix, move);
 
 const board = new Board(game);
