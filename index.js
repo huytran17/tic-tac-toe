@@ -207,6 +207,14 @@ class Board {
         return alert("bot win");
       }
     }, 1000);
+
+    const is_draw = this.game.matrix.every((item) =>
+      item.every((element) => element !== EMPTY)
+    );
+
+    if (is_draw) {
+      return alert("draw");
+    }
   }
 
   drawRows() {
@@ -253,14 +261,8 @@ class Board {
   }
 }
 
-// const range = new Array(MATRIX_SIZE).fill();
-// const matrix = range.map(() => new Array(MATRIX_SIZE).fill("_"));
-
-const matrix = [
-  ["_", "_", "_"],
-  ["_", "_", "_"],
-  ["_", "_", "_"],
-];
+const range = new Array(MATRIX_SIZE).fill();
+const matrix = range.map(() => new Array(MATRIX_SIZE).fill("_"));
 
 const move = new Move();
 const game = new Game(matrix, move);
