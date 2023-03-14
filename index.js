@@ -272,5 +272,4 @@ const matrix = range.map(() => new Array(MATRIX_SIZE).fill("_"));
 
 const move = new Move();
 const game = new Game(matrix, move);
-
 const board = new Board(game);
