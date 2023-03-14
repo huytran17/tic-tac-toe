@@ -195,8 +195,14 @@ class Board {
       return alert("player win");
     }
 
+    const sand_clock = document.getElementById("sand_clock");
+    sand_clock.style.display = "block";
+
     setTimeout(() => {
       this.game.findBestMove();
+
+      sand_clock.style.display = "none";
+
       const invalid_coords = this.game.move.row < 0 || this.game.move.col < 0;
       if (invalid_coords) return;
 

@@ -9,3 +9,17 @@
     justify-content: center;
     margin-top: 20px;
 }
+
+.game__wrapper {
+    position: relative;
+}
+
+#sand_clock {
+    position: absolute;
+    top: 50%;
+    left: 110%;
+    transform: translate(0%, -50%);
+    width: 20px;
+    height: 30px;
+    display: none;
+}
