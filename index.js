@@ -14,7 +14,7 @@ class Game {
   isMovesLeft() {
     for (let i = 0; i < MATRIX_SIZE; i++)
       for (let j = 0; j < MATRIX_SIZE; j++)
-        if (this.matrix[i][j] == EMPTY) return true;
+        if (this.matrix[i][j] === EMPTY) return true;
 
     return false;
   }
