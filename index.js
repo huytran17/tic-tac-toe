@@ -166,9 +166,7 @@ class Board {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.canvas.style.backgroundColor = this.background_color;
-    this.canvas.addEventListener("mousedown", (event) => {
-      this.playerClick(event);
-    });
+    this.canvas.addEventListener("mousedown", this.playerClick.bind(this));
 
     this.cell_size = this.width / MATRIX_SIZE;
 
